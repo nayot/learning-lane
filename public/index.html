@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Learning Lane</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="loginView" class="hero-screen" hidden>
+        <div class="hero-copy">
+          <p class="eyebrow">Cute tutoring quest</p>
+          <h1>Learning Lane</h1>
+          <p>Track tutoring hours, keep the energy glowing, and collect sweet wins across every subject.</p>
+          <a class="primary-link" href="/auth/google">Sign in with Google</a>
+          <p class="fine-print">Parents set up the family first. Linked kid accounts get a read-only progress view.</p>
+        </div>
+        <div class="lane-art" aria-hidden="true">
+          <img class="character-sheet hero-characters" src="/assets/learning-lane-characters.webp" alt="">
+          <span class="cloud cloud-one"></span>
+          <span class="cloud cloud-two"></span>
+          <span class="star star-one">+</span>
+          <span class="star star-two">=</span>
+          <span class="star star-three">%</span>
+          <div class="mascot-badge">
+            <span class="bow bow-left"></span>
+            <span class="bow bow-knot"></span>
+            <span class="bow bow-right"></span>
+            <span class="face-dot face-left"></span>
+            <span class="face-dot face-right"></span>
+            <span class="smile"></span>
+            <strong>GO</strong>
+          </div>
+          <div class="candy-road"></div>
+        </div>
+      </section>
+
+      <section id="onboardingView" class="panel setup-panel" hidden>
+        <div class="section-heading">
+          <p class="eyebrow">First setup</p>
+          <h1>Set up Learning Lane</h1>
+          <p>Create the family, first kid, goals, subjects, and optional prize.</p>
+        </div>
+        <form id="onboardingForm" class="stacked-form">
+          <label>Family name <input id="familyName" required value="Our Family"></label>
+          <label>Kid name <input id="kidName" required placeholder="Name"></label>
+          <label>Kid Google email (optional) <input id="kidEmail" type="email" placeholder="kid@example.com"></label>
+          <div class="field-grid">
+            <label>Weekly goal (minutes) <input id="weeklyMinutes" type="number" min="30" value="300" required></label>
+            <label>Weekday target <input id="weekdayMinutes" type="number" min="5" value="45" required></label>
+            <label>Weekend target <input id="weekendMinutes" type="number" min="5" value="30" required></label>
+          </div>
+          <label>Subjects <input id="initialSubjects" value="Math, English, Science"></label>
+          <div class="field-grid">
+            <label>Long-term prize <input id="prizeName" placeholder="Weekend aquarium trip"></label>
+            <label>Target date <input id="targetDate" type="date"></label>
+            <label>Success threshold % <input id="successPercent" type="number" min="1" max="100" value="100"></label>
+          </div>
+          <button type="submit">Create Family</button>
+        </form>
+      </section>
+
+      <section id="pendingApprovalView" class="panel setup-panel pending-panel" hidden>
+        <div class="section-heading">
+          <p class="eyebrow">Waiting for approval</p>
+          <h1>Request Sent</h1>
+          <p id="pendingApprovalText">Your family setup is waiting for administrator approval.</p>
+        </div>
+        <p>
+          Learning Lane sent the request to the site owner. After approval, sign in again or refresh this page to continue.
+        </p>
+        <button id="pendingRefreshButton" type="button">Check Again</button>
+      </section>
+
+      <section id="appView" hidden>
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Learning Lane</p>
+            <h1 id="kidTitle">Dashboard</h1>
+          </div>
+          <img class="dashboard-character" src="/assets/learning-lane-characters.webp" alt="" aria-hidden="true">
+          <div class="top-actions">
+            <select id="kidSelect" aria-label="Kid profile"></select>
+            <button id="logoutButton" class="secondary" type="button">Log out</button>
+          </div>
+        </header>
+
+        <section class="summary-grid">
+          <article class="stat-panel energy-card">
+            <span class="stat-label">Energy</span>
+            <strong id="energyText">0%</strong>
+            <div class="energy-track"><span id="energyFill"></span></div>
+            <small id="energyHint">No target loaded.</small>
+          </article>
+          <article class="stat-panel weekly-card">
+            <span class="stat-label">Weekly Progress</span>
+            <strong id="weeklyText">0 / 0 min</strong>
+            <small id="weeklyHint">All subjects contribute.</small>
+          </article>
+          <article class="stat-panel streak-summary-card">
+            <span class="stat-label">Streak</span>
+            <strong id="streakText">0 days</strong>
+            <small>Consecutive days with tutoring time.</small>
+          </article>
+          <article class="stat-panel score-card">
+            <span class="stat-label">Average Score</span>
+            <strong id="scoreText">No scores</strong>
+            <small>Performance is optional.</small>
+          </article>
+        </section>
+
+        <section class="progress-playground">
+          <article class="panel lane-map-panel">
+            <div class="section-heading">
+              <h2>Today’s Quest Lane</h2>
+              <p>Keep the heart marker in the green zone by meeting today’s tutoring target.</p>
+            </div>
+            <div class="quest-lane" aria-label="Today progress lane">
+              <div class="zone zone-red">Warm up</div>
+              <div class="zone zone-yellow">Almost</div>
+              <div class="zone zone-green">Green glow</div>
+              <span id="laneMarker" class="lane-marker">♥</span>
+            </div>
+          </article>
+          <article class="panel progress-rings">
+            <div>
+              <span class="ring-label">Weekly</span>
+              <div class="mini-ring" id="weeklyRing"><strong id="weeklyRingText">0%</strong></div>
+            </div>
+            <div>
+              <span class="ring-label">Score</span>
+              <div class="mini-ring score-ring" id="scoreRing"><strong id="scoreRingText">--</strong></div>
+            </div>
+          </article>
+          <article class="panel streak-card">
+            <span class="ring-label">Streak Sparkle</span>
+            <strong id="streakBadgeText">0 days</strong>
+            <div id="streakHearts" class="streak-hearts" aria-label="Streak hearts"></div>
+            <small id="streakHintText">Log tutoring today to start a streak.</small>
+          </article>
+        </section>
+
+        <section id="parentTools" class="workspace">
+          <form id="manualForm" class="panel log-panel">
+            <div class="section-heading">
+              <h2>Log Session</h2>
+              <p>Record completed tutoring time across any subject.</p>
+            </div>
+            <label>Subject <select id="manualSubject"></select></label>
+            <div class="field-grid compact">
+              <label>Minutes <input id="manualMinutes" type="number" min="1" value="30" required></label>
+              <label>Score % <input id="manualPercent" type="number" min="0" max="100" placeholder="Optional"></label>
+            </div>
+            <label>Note <textarea id="manualNote" rows="3" placeholder="Optional note"></textarea></label>
+            <button type="submit">Save Session</button>
+          </form>
+
+          <form id="timerForm" class="panel timer-panel">
+            <div class="section-heading">
+              <h2>Live Timer</h2>
+              <p>Start a tutoring timer, then save it when finished.</p>
+            </div>
+            <label>Subject <select id="timerSubject"></select></label>
+            <label>Target minutes <input id="timerMinutes" type="number" min="1" value="30"></label>
+            <div class="timer-display" id="timerDisplay">0:00</div>
+            <div class="action-row">
+              <button id="startTimer" type="button">Start</button>
+              <button id="stopTimer" class="secondary" type="button">Stop</button>
+              <button id="saveTimer" type="button">Save</button>
+            </div>
+          </form>
+        </section>
+
+        <section id="parentSettings" class="settings-grid">
+          <form id="goalForm" class="panel goals-panel">
+            <h2>Goals</h2>
+            <div class="field-grid compact">
+              <label>Weekly <input id="goalWeekly" type="number" min="30"></label>
+              <label>Weekday <input id="goalWeekday" type="number" min="5"></label>
+              <label>Weekend <input id="goalWeekend" type="number" min="5"></label>
+            </div>
+            <button type="submit">Save Goals</button>
+          </form>
+          <form id="subjectForm" class="panel add-subject-panel">
+            <h2>Add Subject</h2>
+            <div class="field-grid compact">
+              <label>Name <input id="subjectName" placeholder="Art"></label>
+              <label>Color <input id="subjectColor" type="color" value="#60a5fa"></label>
+            </div>
+            <button type="submit">Add Subject</button>
+          </form>
+          <form id="parentInviteForm" class="panel parent-panel">
+            <h2>Add Parent</h2>
+            <label>Google email <input id="parentEmail" type="email" placeholder="parent@example.com"></label>
+            <button type="submit">Allow Parent</button>
+          </form>
+        </section>
+
+        <section id="importPanel" class="panel import-panel" hidden>
+          <div>
+            <h2>Import old math progress?</h2>
+            <p>Sweet Math Quest data was found in this browser. Import it into the selected kid as Math sessions.</p>
+          </div>
+          <button id="importButton" type="button">Import</button>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="panel subjects-panel">
+            <h2>Subjects</h2>
+            <div id="subjectList" class="subject-list"></div>
+          </article>
+          <article class="panel chart-panel stamina-panel">
+            <h2>Subject Stamina</h2>
+            <div id="subjectStaminaChart" class="subject-chart"></div>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="panel chart-panel skill-panel">
+            <h2>Subject Skill</h2>
+            <div id="subjectSkillChart" class="subject-chart"></div>
+          </article>
+          <article class="panel prize-panel">
+            <h2>Prize</h2>
+            <form id="prizeForm" class="prize-form">
+              <label>Prize <input id="editPrizeName" placeholder="Long-term prize"></label>
+              <label>Target date <input id="editTargetDate" type="date"></label>
+              <button id="savePrizeButton" type="submit">Save Prize</button>
+            </form>
+            <p id="prizeText" class="prize-text"></p>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="panel rewards-panel">
+            <h2>Rewards</h2>
+            <div id="rewardList" class="reward-list"></div>
+          </article>
+          <article class="panel history-panel">
+            <h2>Recent Sessions</h2>
+            <div id="historyList" class="history-list"></div>
+          </article>
+        </section>
+      </section>
+    </main>
+    <div id="toast" class="toast" hidden></div>
+    <script src="/app.js"></script>
+  </body>
+</html>
