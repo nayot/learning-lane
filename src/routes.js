@@ -561,6 +561,16 @@ function renderApprovalPage(title, message) {
 </html>`;
 }
 
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[char]));
+}
+
 function normalizeSubjects(subjects) {
   const values = Array.isArray(subjects) ? subjects : String(subjects || "Math, English, Science").split(",");
   const clean = [...new Set(values.map((name) => cleanText(name, "")).filter(Boolean))];
