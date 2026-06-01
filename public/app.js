@@ -279,7 +279,7 @@ function renderSubjects(subjects, parentMode) {
       <strong>${escapeHtml(subject.name)}</strong>
       <small>${subject.minutes} min · ${subject.sessions} session${subject.sessions === 1 ? "" : "s"}</small>
       <small>${subject.averagePerformance === null ? "No score yet" : `${subject.averagePerformance}% average`}</small>
-      ${parentMode ? `<button class="remove-subject secondary" type="button" data-id="${subject.id}">Remove</button>` : ""}
+      ${parentMode ? `<button class="remove-subject" type="button" data-id="${subject.id}" title="Remove">✕</button>` : ""}
     `;
     els.subjectList.append(item);
   });

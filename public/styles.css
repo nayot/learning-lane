@@ -1073,3 +1073,25 @@ p {
   color: var(--hot-pink);
   background: #fff0f5;
 }
+
+.remove-subject {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--hot-pink);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: background .15s;
+}
+.remove-subject:hover {
+  background: #fff0f5;
+}
+.subject-card {
+  position: relative;
+}
