@@ -156,6 +156,15 @@ function createApiRouter() {
     res.json({ ok: true });
   });
 
+  router.delete("/subjects/:subjectId", (req, res) => {
+    const subject = db.prepare("select * from subjects where id = ?").get(req.params.subjectId);
+    if (!subject) return res.status(404).json({ error: "Subject not found." });
+    const access = requireKidParent(req, res, subject.kid_id);
+    if (!access) return;
+    db.prepare("delete from subjects where id = ?").run(subject.id);
+    res.json({ ok: true });
+  });
+
   router.put("/kids/:kidId/goals", (req, res) => {
     const access = requireKidParent(req, res, req.params.kidId);
     if (!access) return;

@@ -221,7 +221,7 @@ function renderDashboard() {
     : "No long-term prize has been set yet.";
 
   renderSubjectSelectors(dashboard.subjects);
-  renderSubjects(dashboard.subjectStats);
+  renderSubjects(dashboard.subjectStats, parentMode);
   renderSubjectStaminaChart(dashboard.subjectStats);
   renderSubjectSkillChart(dashboard.subjectStats);
   renderRewards(dashboard.rewards);
@@ -268,7 +268,7 @@ function renderSubjectSelectors(subjects) {
   });
 }
 
-function renderSubjects(subjects) {
+function renderSubjects(subjects, parentMode) {
   els.subjectList.innerHTML = "";
   subjects.forEach((subject) => {
     const item = document.createElement("article");
@@ -279,9 +279,26 @@ function renderSubjects(subjects) {
       <strong>${escapeHtml(subject.name)}</strong>
       <small>${subject.minutes} min · ${subject.sessions} session${subject.sessions === 1 ? "" : "s"}</small>
       <small>${subject.averagePerformance === null ? "No score yet" : `${subject.averagePerformance}% average`}</small>
+      ${parentMode ? `<button class="remove-subject secondary" type="button" data-id="${subject.id}">Remove</button>` : ""}
     `;
     els.subjectList.append(item);
   });
+  if (parentMode) {
+    els.subjectList.querySelectorAll(".remove-subject").forEach((btn) => {
+      btn.addEventListener("click", () => deleteSubject(Number(btn.dataset.id)));
+    });
+  }
+}
+
+async function deleteSubject(subjectId) {
+  if (!confirm("Remove this subject and all its sessions?")) return;
+  try {
+    await api(`/api/subjects/${subjectId}`, { method: "DELETE" });
+    await loadDashboard();
+    toast("Subject removed.");
+  } catch (error) {
+    toast(error.message);
+  }
 }
 
 function renderSubjectStaminaChart(subjects) {
