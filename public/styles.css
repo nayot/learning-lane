@@ -1013,3 +1013,10 @@ p {
     left: 52%;
   }
 }
+
+.app-footer {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
