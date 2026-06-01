@@ -422,7 +422,7 @@ p {
   top: 8px;
   width: 116px;
   height: 116px;
-  background-image: url("/assets/character-study.webp");
+  background-image: url("assets/character-study.webp");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -432,22 +432,22 @@ p {
 }
 
 .energy-card::before {
-  background-image: url("/assets/character-cheer.webp");
+  background-image: url("assets/character-cheer.webp");
 }
 
 .weekly-card::before {
-  background-image: url("/assets/decor-rainbow.webp");
+  background-image: url("assets/decor-rainbow.webp");
 }
 
 .streak-summary-card::before,
 .streak-card::before {
-  background-image: url("/assets/decor-hearts.webp");
+  background-image: url("assets/decor-hearts.webp");
 }
 
 .score-card::before,
 .skill-panel::before,
 .progress-rings::before {
-  background-image: url("/assets/character-study.webp");
+  background-image: url("assets/character-study.webp");
 }
 
 .lane-map-panel::before {
@@ -455,40 +455,40 @@ p {
   top: 0;
   width: 150px;
   height: 150px;
-  background-image: url("/assets/character-reading.webp");
+  background-image: url("assets/character-reading.webp");
 }
 
 .log-panel::before,
 .subjects-panel::before {
-  background-image: url("/assets/character-reading.webp");
+  background-image: url("assets/character-reading.webp");
 }
 
 .timer-panel::before,
 .stamina-panel::before {
-  background-image: url("/assets/character-cheer.webp");
+  background-image: url("assets/character-cheer.webp");
 }
 
 .goals-panel::before {
-  background-image: url("/assets/decor-books.webp");
+  background-image: url("assets/decor-books.webp");
 }
 
 .add-subject-panel::before {
-  background-image: url("/assets/decor-hearts.webp");
+  background-image: url("assets/decor-hearts.webp");
 }
 
 .prize-panel::before {
   width: 124px;
   height: 124px;
-  background-image: url("/assets/decor-books.webp");
+  background-image: url("assets/decor-books.webp");
 }
 
 .rewards-panel::before {
-  background-image: url("/assets/decor-rainbow.webp");
+  background-image: url("assets/decor-rainbow.webp");
 }
 
 .history-panel::before,
 .parent-panel::before {
-  background-image: url("/assets/decor-books.webp");
+  background-image: url("assets/decor-books.webp");
 }
 
 .panel {
