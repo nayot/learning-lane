@@ -227,6 +227,15 @@ function createApiRouter() {
     res.status(201).json({ sessionId: result.lastInsertRowid });
   });
 
+  router.delete("/sessions/:sessionId", (req, res) => {
+    const session = db.prepare("select * from study_sessions where id = ?").get(req.params.sessionId);
+    if (!session) return res.status(404).json({ error: "Session not found." });
+    const access = requireKidParent(req, res, session.kid_id);
+    if (!access) return;
+    db.prepare("delete from study_sessions where id = ?").run(session.id);
+    res.json({ ok: true });
+  });
+
   router.post("/kids/:kidId/import-local-sessions", (req, res) => {
     const access = requireKidParent(req, res, req.params.kidId);
     if (!access) return;

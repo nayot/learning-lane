@@ -225,7 +225,7 @@ function renderDashboard() {
   renderSubjectStaminaChart(dashboard.subjectStats);
   renderSubjectSkillChart(dashboard.subjectStats);
   renderRewards(dashboard.rewards);
-  renderHistory(dashboard.sessions);
+  renderHistory(dashboard.sessions, parentMode);
   els.importPanel.hidden = !parentMode || !localStorage.getItem(oldStorageKey);
 }
 
@@ -354,25 +354,60 @@ function renderRewards(rewards) {
   });
 }
 
-function renderHistory(sessions) {
+function renderHistory(sessions, parentMode) {
   els.historyList.innerHTML = "";
   if (!sessions.length) {
     els.historyList.innerHTML = '<p class="empty">No tutoring sessions yet.</p>';
     return;
   }
+  const table = document.createElement("table");
+  table.className = "log-table";
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Subject</th>
+        <th>Min</th>
+        <th>Score</th>
+        <th>Note</th>
+        <th>Source</th>
+        ${parentMode ? "<th></th>" : ""}
+      </tr>
+    </thead>
+  `;
+  const tbody = document.createElement("tbody");
   sessions.forEach((session) => {
-    const item = document.createElement("article");
-    item.className = "history-item";
-    const score = session.performance_percent === null ? "No score" : `${session.performance_percent}%`;
-    item.innerHTML = `
-      <div>
-        <strong>${escapeHtml(session.subject_name)} · ${session.minutes} min</strong>
-        <small>${formatDate(session.session_date)} · ${score}${session.note ? ` · ${escapeHtml(session.note)}` : ""}</small>
-      </div>
-      <span>${escapeHtml(session.source)}</span>
+    const score = session.performance_percent === null ? "—" : `${session.performance_percent}%`;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${formatDate(session.session_date)}</td>
+      <td><span class="subject-dot" style="background:${session.subject_color}"></span>${escapeHtml(session.subject_name)}</td>
+      <td>${session.minutes}</td>
+      <td>${score}</td>
+      <td class="note-cell">${session.note ? escapeHtml(session.note) : ""}</td>
+      <td><span class="source-tag">${escapeHtml(session.source)}</span></td>
+      ${parentMode ? `<td><button class="remove-session" type="button" data-id="${session.id}" title="Remove">✕</button></td>` : ""}
     `;
-    els.historyList.append(item);
+    tbody.append(tr);
   });
+  table.append(tbody);
+  els.historyList.append(table);
+  if (parentMode) {
+    tbody.querySelectorAll(".remove-session").forEach((btn) => {
+      btn.addEventListener("click", () => deleteSession(Number(btn.dataset.id)));
+    });
+  }
+}
+
+async function deleteSession(sessionId) {
+  if (!confirm("Remove this session?")) return;
+  try {
+    await api(`/api/sessions/${sessionId}`, { method: "DELETE" });
+    await loadDashboard();
+    toast("Session removed.");
+  } catch (error) {
+    toast(error.message);
+  }
 }
 
 async function submitManualSession(event) {
