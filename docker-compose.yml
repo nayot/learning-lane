@@ -1,0 +1,22 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_PATH=/app/data/learning-lane.sqlite
+      - SESSION_SECRET=${SESSION_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL}
+      - APP_BASE_URL=${APP_BASE_URL}
+      - FAMILY_APPROVAL_REQUIRED=${FAMILY_APPROVAL_REQUIRED:-true}
+      - FAMILY_APPROVAL_EMAIL=${FAMILY_APPROVAL_EMAIL}
+      - FAMILY_APPROVAL_TTL_HOURS=${FAMILY_APPROVAL_TTL_HOURS:-72}
+      - GMAIL_SENDER_EMAIL=${GMAIL_SENDER_EMAIL}
+      - GMAIL_REFRESH_TOKEN=${GMAIL_REFRESH_TOKEN}
