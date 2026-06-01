@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const session = require("express-session");
@@ -12,6 +13,7 @@ ensureDatabase();
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
+const mountPath = (process.env.MOUNT_PATH || "").replace(/\/$/, "");
 
 class SQLiteSessionStore extends session.Store {
   get(sid, callback) {
@@ -58,7 +60,7 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.COOKIE_SECURE !== "false" && process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60 * 24 * 14
     }
   })
@@ -103,7 +105,7 @@ passport.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get("/auth/google", (req, res, next) => {
+app.get(`${mountPath}/auth/google`, (req, res, next) => {
   if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
     res.status(500).send("Google OAuth is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.");
     return;
@@ -112,34 +114,43 @@ app.get("/auth/google", (req, res, next) => {
 });
 
 app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/?login=failed" }),
+  `${mountPath}/auth/google/callback`,
+  passport.authenticate("google", { failureRedirect: `${mountPath}/?login=failed` }),
   (req, res) => {
     if (req.session.pendingApprovalToken) {
       const token = req.session.pendingApprovalToken;
       delete req.session.pendingApprovalToken;
-      res.redirect(`/admin/family-requests/${encodeURIComponent(token)}/approve`);
+      res.redirect(`${mountPath}/admin/family-requests/${encodeURIComponent(token)}/approve`);
       return;
     }
-    res.redirect("/");
+    res.redirect(`${mountPath}/`);
   }
 );
 
-app.post("/auth/logout", (req, res, next) => {
+app.post(`${mountPath}/auth/logout`, (req, res, next) => {
   req.logout((error) => {
     if (error) return next(error);
     res.json({ ok: true });
   });
 });
 
-app.use("/api", createApiRouter());
-app.use("/admin", createApprovalRouter());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(`${mountPath}/api`, createApiRouter());
+app.use(`${mountPath}/admin`, createApprovalRouter());
+
+const rawIndexHtml = fs.readFileSync(path.join(__dirname, "public", "index.html"), "utf8");
+const indexHtml = mountPath
+  ? rawIndexHtml.replace("<head>", `<head>\n    <base href="${mountPath}/">\n    <meta name="mount-path" content="${mountPath}">`)
+  : rawIndexHtml;
+app.get([mountPath || "/", `${mountPath}/`].filter(Boolean), (req, res) => {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(indexHtml);
+});
+app.use(mountPath || "/", express.static(path.join(__dirname, "public"), { index: false }));
 
 app.use((error, req, res, next) => {
   console.error(error);
   const message = process.env.NODE_ENV === "production" ? "Request failed." : error.message;
-  if (req.path.startsWith("/api")) {
+  if (req.path.startsWith(`${mountPath}/api`)) {
     res.status(500).json({ error: message });
     return;
   }

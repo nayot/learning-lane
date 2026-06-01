@@ -1,3 +1,5 @@
+const MOUNT_PATH = document.querySelector('meta[name="mount-path"]')?.content ?? "";
+
 const state = {
   me: null,
   dashboard: null,
@@ -474,11 +476,11 @@ async function importOldSessions() {
 
 async function logout() {
   await api("/auth/logout", { method: "POST", body: {} });
-  window.location.href = "/";
+  window.location.href = MOUNT_PATH + "/";
 }
 
 async function api(url, options = {}) {
-  const response = await fetch(url, {
+  const response = await fetch(MOUNT_PATH + url, {
     method: options.method || "GET",
     headers: options.body ? { "Content-Type": "application/json" } : undefined,
     body: options.body ? JSON.stringify(options.body) : undefined

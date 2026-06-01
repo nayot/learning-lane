@@ -287,7 +287,7 @@ function createApprovalRouter() {
       const admin = adminEmail.toLowerCase();
       if (!req.user || normalizeEmail(req.user.email) !== admin) {
         req.session.pendingApprovalToken = token;
-        req.session.save(() => res.redirect("/auth/google"));
+        req.session.save(() => res.redirect(mountPath() + "/auth/google"));
         return;
       }
 
@@ -533,6 +533,10 @@ function appBaseUrl() {
   return String(process.env.APP_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
 }
 
+function mountPath() {
+  return (process.env.MOUNT_PATH || "").replace(/\/$/, "");
+}
+
 function hashToken(token) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
@@ -555,7 +559,7 @@ function renderApprovalPage(title, message) {
     <main>
       <h1>${escapeHtml(title)}</h1>
       <p>${escapeHtml(message)}</p>
-      <a href="/">Back to Learning Lane</a>
+      <a href="${mountPath()}/">Back to Learning Lane</a>
     </main>
   </body>
 </html>`;
